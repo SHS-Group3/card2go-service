@@ -2,8 +2,10 @@ package model
 
 import "gorm.io/gorm"
 
-type Hotel struct {
+/**
+
+ */
+type POI struct {
 	gorm.Model
 	Location
-	Rates float32
 }
