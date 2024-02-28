@@ -6,3 +6,6 @@ var (
 	DBPassword = "user"
 	DBName     = "card2go"
 )
+
+func LoadFromEnv() {
+}
