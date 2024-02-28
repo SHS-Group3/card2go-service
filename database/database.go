@@ -22,7 +22,7 @@ func Connect() error {
 	}
 
 	// create schemas/update schemas on the database
-	DB.AutoMigrate(&model.User{}, &model.Hotel{})
+	DB.AutoMigrate(&model.User{}, &model.Location{})
 
 	return nil
 }
