@@ -1,7 +1,7 @@
 package database
 
 import (
-	"card2go_service/internal/config"
+	"card2go_service/config"
 	"fmt"
 
 	"gorm.io/driver/postgres"
@@ -16,5 +16,5 @@ func Connect() {
 	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s sslmode=disable", config.Host, config.DBUser, config.DBPassword, config.DBName)
 	DB, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
 
-	_, _ = err, dsn
+	_ = err
 }
