@@ -1,11 +1,12 @@
 package model
 
+import "gorm.io/gorm"
+
 type Location struct {
+	gorm.Model
 	Name        string
 	Description string
 	Address     string
-}
-
-type Locatable interface {
-	Location
+	IsLodging   bool
+	Packages    []Package
 }
