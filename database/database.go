@@ -21,7 +21,7 @@ func Connect() error {
 		return err
 	}
 
-	// create schemas on the database
+	// create schemas/update schemas on the database
 	DB.AutoMigrate(&model.User{}, &model.Hotel{})
 
 	return nil
