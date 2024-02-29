@@ -4,6 +4,7 @@ import (
 	"card2go_service/database"
 	"card2go_service/model"
 	"errors"
+	"fmt"
 	"net/http"
 
 	"github.com/gofiber/fiber/v2"
@@ -14,7 +15,15 @@ type RegistrationInfo struct {
 	Password string `json: "password"`
 }
 
+// /auth/register endpoint
 func HandleRegister(c *fiber.Ctx) error {
+	DB, err := database.GetConnection()
+
+	if err != nil {
+		fmt.Errorf("Error connecting to database %s", err.Error())
+		return err
+	}
+
 	var info RegistrationInfo
 
 	if err := c.BodyParser(&info); err != nil {
@@ -24,6 +33,7 @@ func HandleRegister(c *fiber.Ctx) error {
 		return nil
 	}
 
+	// check if username and password field were initialized
 	if info.Username == "" || info.Password == "" {
 		err := errors.New("missing fields")
 		c.Status(http.StatusBadRequest).JSON(fiber.Map{
@@ -32,8 +42,10 @@ func HandleRegister(c *fiber.Ctx) error {
 		return nil
 	}
 
+	// check if username is unique
 	var count int64
-	database.DB.Where("username = ?", info.Username).Model(&model.User{}).Count(&count)
+
+	DB.Where("username = ?", info.Username).Model(&model.User{}).Count(&count)
 
 	if count > 0 {
 		err := errors.New("username taken")
@@ -49,7 +61,7 @@ func HandleRegister(c *fiber.Ctx) error {
 	user.Password = info.Password
 	user.Admin = false
 
-	database.DB.Create(&user)
+	DB.Create(&user)
 
 	c.Status(http.StatusCreated).JSON(fiber.Map{
 		"id": user.ID,
