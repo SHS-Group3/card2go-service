@@ -20,6 +20,7 @@ func RegisterAdmins(app *fiber.App) {
 
 func RegisterAuth(app *fiber.App) {
 	path := app.Group("/auth")
+	path.Post("/", auth.HandleAuthentication)
 	path.Post("/register", auth.HandleRegister)
 }
 
