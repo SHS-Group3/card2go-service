@@ -1,12 +1,17 @@
 package config
 
-import "os"
+import (
+	"log"
+	"os"
+	"strconv"
+)
 
 var (
 	Host       = "localhost"
 	DBUser     = "postgres"
 	DBPassword = "user"
 	DBName     = "card2go"
+	DBPort     = 5432
 )
 
 func LoadFromEnv() {
@@ -25,5 +30,13 @@ func LoadFromEnv() {
 	dbName, defined := os.LookupEnv("DBNAME")
 	if defined {
 		DBName = dbName
+	}
+	dbPort, defined := os.LookupEnv("DBPORT")
+	if defined {
+		port, err := strconv.ParseInt(dbPort, 10, 32)
+		if err != nil {
+			log.Fatal("Error while converting port to int ", err.Error())
+		}
+		DBPort = int(port)
 	}
 }
