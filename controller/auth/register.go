@@ -10,11 +10,6 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-type RegistrationInfo struct {
-	Username string `json: "username"`
-	Password string `json: "password"`
-}
-
 // /auth/register endpoint
 func HandleRegister(c *fiber.Ctx) error {
 	DB, err := database.GetConnection()
@@ -24,7 +19,11 @@ func HandleRegister(c *fiber.Ctx) error {
 		return err
 	}
 
-	var info RegistrationInfo
+	type registrationInfo struct {
+		Username string `json: "username"`
+		Password string `json: "password"`
+	}
+	var info registrationInfo
 
 	if err := c.BodyParser(&info); err != nil {
 		c.Status(http.StatusBadRequest).JSON(fiber.Map{

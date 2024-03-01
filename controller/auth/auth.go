@@ -8,15 +8,12 @@ import (
 	"net/http"
 
 	"github.com/gofiber/fiber/v2"
+	_ "github.com/golang-jwt/jwt/v5"
 )
-
-type AuthenticationInfo struct {
-	Username string `json: "username"`
-	Password string `json: "password"`
-}
 
 // /auth endpoint
 func HandleAuthentication(c *fiber.Ctx) error {
+
 	DB, err := database.GetConnection()
 
 	if err != nil {
@@ -24,7 +21,11 @@ func HandleAuthentication(c *fiber.Ctx) error {
 		return err
 	}
 
-	var info AuthenticationInfo
+	type authenticationInfo struct {
+		Username string `json: "username"`
+		Password string `json: "password"`
+	}
+	var info authenticationInfo
 
 	if err := c.BodyParser(&info); err != nil {
 		c.Status(http.StatusBadRequest).JSON(fiber.Map{
