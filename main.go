@@ -11,6 +11,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/logger"
+	"github.com/gofiber/fiber/v2/middleware/recover"
 	"github.com/gofiber/fiber/v2/middleware/requestid"
 	"github.com/joho/godotenv"
 )
@@ -44,6 +45,8 @@ func main() {
 		// For more options, see the Config section
 		Format: "[${ip}] ${locals:requestid} ${status} - ${method} ${path}\n",
 	}))
+
+	app.Use(recover.New())
 
 	if err := godotenv.Load(); err != nil {
 		fmt.Errorf("Error loading .env file ")
