@@ -6,11 +6,11 @@ type Booking struct {
 	gorm.Model
 
 	ClientID uint
-	Client   User
+	Client   User `json:"user_id" gorm:"not null"`
 
-	LocationID uint
-	Location   Location
+	LocationID   uint `json:"location_id" gorm:"not null"`
+	LocationType string
 
-	PackageID uint
+	PackageID uint `json:"package_id" gorm:"not null"`
 	Package   Package
 }

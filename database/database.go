@@ -19,7 +19,7 @@ func SetupDB() error {
 	}
 
 	// create schemas/update schemas on the database
-	DB.AutoMigrate(&model.User{}, &model.Location{}, &model.Booking{}, &model.Package{})
+	DB.AutoMigrate(&model.User{}, &model.POI{}, &model.Booking{}, &model.Package{})
 
 	return nil
 }
