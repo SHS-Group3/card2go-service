@@ -4,15 +4,46 @@ import (
 	"card2go_service/config"
 	"card2go_service/database"
 	"card2go_service/routes"
+	"errors"
 	"fmt"
 	"log"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/cors"
+	"github.com/gofiber/fiber/v2/middleware/logger"
+	"github.com/gofiber/fiber/v2/middleware/requestid"
 	"github.com/joho/godotenv"
 )
 
 func main() {
-	app := fiber.New()
+	app := fiber.New(fiber.Config{
+		ErrorHandler: func(c *fiber.Ctx, err error) error {
+			// Status code defaults to 500
+			code := fiber.StatusInternalServerError
+
+			// Retrieve the custom status code if it's a *fiber.Error
+			var e *fiber.Error
+			if errors.As(err, &e) {
+				code = e.Code
+			}
+
+			c.Set(fiber.HeaderContentType, fiber.MIMEApplicationJSON)
+
+			// Return status code with error message
+			return c.Status(code).JSON(fiber.Map{
+				"code":  code,
+				"error": err.Error(),
+			})
+		},
+	})
+
+	app.Use(cors.New())
+
+	app.Use(requestid.New())
+	app.Use(logger.New(logger.Config{
+		// For more options, see the Config section
+		Format: "[${ip}] ${locals:requestid} ${status} - ${method} ${path}\n",
+	}))
 
 	if err := godotenv.Load(); err != nil {
 		fmt.Errorf("Error loading .env file ")
@@ -26,5 +57,5 @@ func main() {
 
 	routes.RegisterAPI(app)
 
-	app.Listen(":8080")
+	log.Fatal(app.Listen(":8080"))
 }
