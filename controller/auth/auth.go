@@ -1,6 +1,7 @@
 package auth
 
 import (
+	"card2go_service/config"
 	"card2go_service/database"
 	"card2go_service/model"
 	"errors"
@@ -8,6 +9,7 @@ import (
 	"net/http"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/golang-jwt/jwt/v5"
 	_ "github.com/golang-jwt/jwt/v5"
 )
 
@@ -31,7 +33,7 @@ func HandleAuthentication(c *fiber.Ctx) error {
 		c.Status(http.StatusBadRequest).JSON(fiber.Map{
 			"message": err.Error(),
 		})
-		return err
+		return nil
 	}
 
 	var user model.User
@@ -46,8 +48,12 @@ func HandleAuthentication(c *fiber.Ctx) error {
 		return nil
 	}
 
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+		"id": user.ID,
+	})
+	signed, _ := token.SignedString(config.TokenKey)
 	c.Status(http.StatusOK).JSON(fiber.Map{
-		"token": "i would put a token here but no!",
+		"token": signed,
 	})
 
 	return nil
