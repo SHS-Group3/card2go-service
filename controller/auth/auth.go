@@ -10,7 +10,6 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt/v5"
-	_ "github.com/golang-jwt/jwt/v5"
 )
 
 // /auth endpoint
