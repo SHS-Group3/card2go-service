@@ -5,8 +5,8 @@ import "gorm.io/gorm"
 type Booking struct {
 	gorm.Model
 
-	ClientID uint
-	Client   User `json:"user_id" gorm:"not null"`
+	UserID uint
+	User   User `json:"user_id" gorm:"not null"`
 
 	LocationID   uint `json:"location_id" gorm:"not null"`
 	LocationType string
