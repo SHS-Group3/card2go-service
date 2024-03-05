@@ -50,9 +50,12 @@ func HandleFeed(c *fiber.Ctx) error {
 	}
 
 	var hotels []model.Hotel
-	DB.Model(&model.Hotel{}).Order("created_at desc").Limit(20).Offset(offset).Find(&hotels)
+	err = DB.Model(&model.Hotel{}).Order("created_at desc").Limit(20).Offset(offset).Find(&hotels).Error
+	if err != nil {
+		return err
+	}
 
 	c.JSON(hotels)
 
-	return c.Next()
+	return nil
 }

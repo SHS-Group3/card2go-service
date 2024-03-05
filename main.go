@@ -68,5 +68,5 @@ func setupDB() {
 		log.Fatal("Failed to connect to database! ", err.Error())
 	}
 
-	DB.AutoMigrate(&model.User{}, &model.POI{}, &model.Booking{}, &model.Package{})
+	DB.AutoMigrate(&model.User{}, &model.POI{}, &model.Booking{}, &model.Package{}, &model.Hotel{})
 }
