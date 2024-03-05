@@ -3,6 +3,7 @@ package main
 import (
 	"card2go_service/config"
 	"card2go_service/database"
+	"card2go_service/model"
 	"card2go_service/routes"
 	"errors"
 	"fmt"
@@ -54,11 +55,18 @@ func main() {
 
 	config.LoadFromEnv()
 
-	if err := database.SetupDB(); err != nil {
-		log.Fatal("Error when connecting to database ", err)
-	}
+	setupDB()
 
 	routes.RegisterAPI(app)
 
 	log.Fatal(app.Listen(":8080"))
+}
+
+func setupDB() {
+	DB, err := database.GetConnection()
+	if err != nil {
+		log.Fatal("Failed to connect to database! ", err.Error())
+	}
+
+	DB.AutoMigrate(&model.User{}, &model.POI{}, &model.Booking{}, &model.Package{})
 }
