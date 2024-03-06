@@ -12,7 +12,7 @@ var (
 	DBPassword = "user"
 	DBName     = "card2go"
 	DBPort     = 5432
-	TokenKey   []byte
+	TokenKey   = []byte("this is a key")
 )
 
 func LoadFromEnv() {
@@ -43,7 +43,5 @@ func LoadFromEnv() {
 	tokenKey, defined := os.LookupEnv("SECRETKEY")
 	if defined {
 		TokenKey = []byte(tokenKey)
-	} else {
-		log.Fatal("No secret key defined!")
 	}
 }
