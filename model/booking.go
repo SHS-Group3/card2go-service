@@ -2,12 +2,15 @@ package model
 
 import (
 	"card2go_service/database"
+	"time"
 
 	"gorm.io/gorm"
 )
 
 type Booking struct {
 	gorm.Model
+
+	On time.Time
 
 	UserID uint
 	User   User `json:"user_id" gorm:"not null"`
@@ -29,11 +32,11 @@ func (booking *Booking) GetLocation() (interface{}, error) {
 
 	// why do i do this to myself
 	switch booking.LocationType {
-	case "hotel":
+	case "hotels":
 		var hotel Hotel
 		err = query.Find(&hotel)
 		return hotel, err
-	case "poi":
+	case "pois":
 		var poi POI
 		err = query.Find(&poi)
 		return poi, err
