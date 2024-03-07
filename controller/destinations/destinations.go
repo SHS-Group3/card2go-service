@@ -1,4 +1,4 @@
-package hotels
+package destinations
 
 import (
 	"card2go_service/database"
@@ -9,7 +9,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-func HandleHotel(c *fiber.Ctx) error {
+func HandleDestination(c *fiber.Ctx) error {
 	DB, err := database.GetConnection()
 	if err != nil {
 		fmt.Errorf("Error connecting to database %s", err.Error())
@@ -21,14 +21,14 @@ func HandleHotel(c *fiber.Ctx) error {
 		return fiber.NewError(fiber.ErrBadRequest.Code, "invalid id")
 	}
 
-	var hotel model.Hotel
-	DB.Model(&hotel).Where("id = ?", id).Preload("Packages").Limit(1).Find(&hotel)
+	var destination model.Destination
+	DB.Model(&destination).Where("id = ?", id).Preload("Packages").Limit(1).Find(&destination)
 
-	if hotel.ID == 0 {
-		return fiber.NewError(fiber.ErrBadRequest.Code, "hotel id not found")
+	if destination.ID == 0 {
+		return fiber.NewError(fiber.ErrBadRequest.Code, "destination id not found")
 	}
 
-	c.Status(fiber.StatusOK).JSON(hotel)
+	c.Status(fiber.StatusOK).JSON(destination)
 
 	return nil
 }
@@ -49,13 +49,13 @@ func HandleFeed(c *fiber.Ctx) error {
 		return fiber.NewError(fiber.ErrBadRequest.Code, "invalid page")
 	}
 
-	var hotels []model.Hotel
-	err = DB.Model(&model.Hotel{}).Order("created_at desc").Limit(20).Offset(offset).Find(&hotels).Error
+	var dest []model.Destination
+	err = DB.Model(&model.Destination{}).Order("created_at desc").Limit(20).Offset(offset).Find(&dest).Error
 	if err != nil {
 		return err
 	}
 
-	c.JSON(hotels)
+	c.JSON(dest)
 
 	return nil
 }

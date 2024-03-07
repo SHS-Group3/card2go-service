@@ -17,3 +17,14 @@ type Destination struct {
 	Bookings []Booking `json:"bookings"`
 	Packages []Package `json:"packages"`
 }
+
+func NewDestination() Destination {
+	return Destination{
+		Packages: []Package{
+			Package{
+				Title:       "Plan",
+				Description: "Plan your trip",
+			},
+		},
+	}
+}

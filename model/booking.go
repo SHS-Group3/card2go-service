@@ -11,12 +11,9 @@ type Booking struct {
 
 	On time.Time
 
-	UserID uint
-	User   User `json:"user_id" gorm:"not null"`
+	UserID uint `gorm:"not null"`
 
-	DestinationID uint `json:"location_id" gorm:"not null"`
-	Destination   Destination
+	DestinationID uint `gorm:"not null"`
 
-	PackageID uint `json:"package_id" gorm:"not null"`
-	Package   Package
+	PackageID uint
 }
