@@ -12,7 +12,7 @@ type IDClaim struct {
 }
 
 func CreateSignedToken(id uint) string {
-	str, _ := jwt.NewWithClaims(jwt.SigningMethodES256, IDClaim{
+	str, _ := jwt.NewWithClaims(jwt.SigningMethodHS256, IDClaim{
 		ID: id,
 	}).SignedString(config.TokenKey)
 	return str

@@ -94,13 +94,13 @@ func HandleFeed(c *fiber.Ctx) error {
 	DB := c.Locals("database").(*gorm.DB)
 
 	offset := (c.QueryInt("page", 1) - 1) * 20
-
+	//
 	if offset < 0 {
 		return fiber.NewError(fiber.ErrBadRequest.Code, "invalid page")
 	}
 
 	var dests []model.Destination
-	err := DB.Model(&model.Destination{}).Preload("Packages").Order("created_at desc").Limit(20).Offset(offset).Find(&dests).Error
+	err := DB.Model(&model.Destination{}).Preload("Packages").Order("created_at desc").Offset(offset).Limit(20).Find(&dests).Error
 	if err != nil {
 		return err
 	}
