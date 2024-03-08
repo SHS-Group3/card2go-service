@@ -30,7 +30,7 @@ Destination {
     "is_lodging": boolean,
     "booked": boolean,
     "beds": int,
-    "rooms: int,
+    "rooms": int,
     "packages": Package {
         "id": int,
         "title": String,
