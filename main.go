@@ -19,25 +19,7 @@ import (
 
 func main() {
 	app := fiber.New(fiber.Config{
-		ErrorHandler: func(c *fiber.Ctx, err error) error {
-			// Status code defaults to 500
-			code := fiber.StatusInternalServerError
-
-			// Retrieve the custom status code if it's a *fiber.Error
-			var e *fiber.Error
-			if errors.As(err, &e) {
-				code = e.Code
-			}
-
-			c.Set(fiber.HeaderContentType, fiber.MIMEApplicationJSON)
-
-			// Return status code with error message
-			return c.Status(code).JSON(fiber.Map{
-				"code":  code,
-				"error": err.Error(),
-			})
-		},
-	})
+		ErrorHandler: errorHandler})
 
 	app.Use(cors.New())
 
@@ -68,5 +50,24 @@ func setupDB() {
 		log.Fatal("Failed to connect to database! ", err.Error())
 	}
 
-	DB.AutoMigrate(&model.User{}, &model.POI{}, &model.Booking{}, &model.Package{}, &model.Hotel{})
+	DB.AutoMigrate(&model.User{}, &model.Destination{}, &model.Package{}, &model.Booking{})
+}
+
+func errorHandler(c *fiber.Ctx, err error) error {
+	// Status code defaults to 500
+	code := fiber.StatusInternalServerError
+
+	// Retrieve the custom status code if it's a *fiber.Error
+	var e *fiber.Error
+	if errors.As(err, &e) {
+		code = e.Code
+	}
+
+	c.Set(fiber.HeaderContentType, fiber.MIMEApplicationJSON)
+
+	// Return status code with error message
+	return c.Status(code).JSON(fiber.Map{
+		"code":  code,
+		"error": err.Error(),
+	})
 }

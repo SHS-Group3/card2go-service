@@ -9,22 +9,21 @@ type Destination struct {
 	Name        string  `json:"name" gorm:"not null"`
 	Description string  `json:"description" gorm:"not null"`
 	Address     string  `json:"address" gorm:"not null"`
-	Ratings     float32 `json:"ratings"`
+	Ratings     float64 `json:"ratings"`
 	IsLodging   bool    `json:"is_lodging"`
 	Beds        int     `json:"beds"`
 	Rooms       int     `json:"rooms"`
 
-	Bookings []Booking `json:"bookings"`
 	Packages []Package `json:"packages"`
 }
 
-func NewDestination() Destination {
-	return Destination{
-		Packages: []Package{
-			Package{
-				Title:       "Plan",
-				Description: "Plan your trip",
-			},
-		},
-	}
-}
+// func NewDestination() Destination {
+// 	return Destination{
+// 		Packages: []Package{
+// 			Package{
+// 				Title:       "Plan",
+// 				Description: "Plan your trip",
+// 			},
+// 		},
+// 	}
+// }

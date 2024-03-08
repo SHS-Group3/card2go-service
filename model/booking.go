@@ -8,12 +8,16 @@ import (
 
 type Booking struct {
 	gorm.Model
+	BookingID uint `gorm:"unique;autoIncrement"`
 
 	On time.Time
 
-	UserID uint `gorm:"not null"`
+	UserID uint
+	User   User
 
-	DestinationID uint `gorm:"not null"`
+	DestinationID uint
+	Destination   Destination
 
-	PackageID uint
+	PackageID *uint
+	Package   *Package
 }
