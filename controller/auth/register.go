@@ -1,23 +1,18 @@
 package auth
 
 import (
-	"card2go_service/database"
 	"card2go_service/model"
 	"errors"
-	"fmt"
 	"net/http"
 
 	"github.com/gofiber/fiber/v2"
+	"gorm.io/gorm"
 )
 
 // /auth/register endpoint
+// requires database
 func HandleRegister(c *fiber.Ctx) error {
-	DB, err := database.GetConnection()
-
-	if err != nil {
-		fmt.Errorf("Error connecting to database %s", err.Error())
-		return err
-	}
+	DB := c.Locals("database").(*gorm.DB)
 
 	type registrationInfo struct {
 		Username string `json: "username"`

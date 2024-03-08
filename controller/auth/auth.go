@@ -1,26 +1,19 @@
 package auth
 
 import (
-	"card2go_service/config"
-	"card2go_service/database"
+	auth "card2go_service/authentication"
 	"card2go_service/model"
 	"errors"
-	"fmt"
 	"net/http"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/golang-jwt/jwt/v5"
+	"gorm.io/gorm"
 )
 
 // /auth endpoint
+// requires database
 func HandleAuthentication(c *fiber.Ctx) error {
-
-	DB, err := database.GetConnection()
-
-	if err != nil {
-		fmt.Errorf("Error connecting to database %s", err.Error())
-		return err
-	}
+	DB := c.Locals("database").(*gorm.DB)
 
 	type authenticationInfo struct {
 		Username string `json: "username"`
@@ -37,7 +30,7 @@ func HandleAuthentication(c *fiber.Ctx) error {
 
 	var user model.User
 
-	DB.Where("username = ? AND password = ?", info.Username, info.Password).Select("id").Limit(1).First(&user)
+	DB.Where("username = ? AND password = ?", info.Username, info.Password).Select("id").Limit(1).Find(&user)
 
 	if user.ID == 0 {
 		err := errors.New("authentication failed")
@@ -47,12 +40,9 @@ func HandleAuthentication(c *fiber.Ctx) error {
 		return nil
 	}
 
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"id": user.ID,
-	})
-	signed, _ := token.SignedString(config.TokenKey)
+	token := auth.CreateSignedToken(user.ID)
 	c.Status(http.StatusOK).JSON(fiber.Map{
-		"token": signed,
+		"token": token,
 	})
 
 	return nil

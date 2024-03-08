@@ -1,19 +1,18 @@
 package admin
 
 import (
-	"card2go_service/database"
 	"card2go_service/model"
 	"fmt"
 	"math"
 
 	"github.com/gofiber/fiber/v2"
+	"gorm.io/gorm"
 )
 
+// GET /admin/destinations/clear
+// requires database
 func HandleClearDestinations(c *fiber.Ctx) error {
-	DB, err := database.GetConnection()
-	if err != nil {
-		return err
-	}
+	DB := c.Locals("database").(*gorm.DB)
 
 	DB.Delete(&model.Destination{})
 
@@ -21,11 +20,10 @@ func HandleClearDestinations(c *fiber.Ctx) error {
 	return nil
 }
 
+// GET /admin/destinations/dummy
+// requires database
 func HandleCreateDummyDestinations(c *fiber.Ctx) error {
-	DB, err := database.GetConnection()
-	if err != nil {
-		return err
-	}
+	DB := c.Locals("database").(*gorm.DB)
 
 	var dests []model.Destination
 
