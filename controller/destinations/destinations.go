@@ -62,7 +62,7 @@ func HandleDestination(c *fiber.Ctx) error {
 		Beds        int    `json:"beds"`
 		Rooms       int    `json:"rooms"`
 
-		Packages []returnPackage
+		Packages []returnPackage `json:"packages"`
 	}
 
 	a := returnDestination{
@@ -121,7 +121,7 @@ func HandleFeed(c *fiber.Ctx) error {
 		Beds        int    `json:"beds"`
 		Rooms       int    `json:"rooms"`
 
-		Packages []returnPackage
+		Packages []returnPackage `json:"packages"`
 	}
 
 	var returnDests []returnDestination
