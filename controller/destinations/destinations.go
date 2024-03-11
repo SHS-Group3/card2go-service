@@ -187,16 +187,16 @@ func HandleBook(c *fiber.Ctx) error {
 		}
 	}
 
-	err = DB.Transaction(func(tx *gorm.DB) error {
-		booking := model.Booking{
-			// On: ...
-			Destination: dest,
-			User:        user,
-		}
+	booking := model.Booking{
+		// On: ...
+		Destination: dest,
+		User:        user,
+	}
+	if pid != 0 {
+		booking.Package = &pkg
+	}
 
-		if pid != 0 {
-			booking.Package = &pkg
-		}
+	err = DB.Transaction(func(tx *gorm.DB) error {
 		tx.Create(&booking)
 
 		return nil
@@ -204,6 +204,10 @@ func HandleBook(c *fiber.Ctx) error {
 	if err != nil {
 		return err
 	}
+
+	c.Status(fiber.StatusCreated).JSON(fiber.Map{
+		"id": booking.ID,
+	})
 
 	return nil
 }
