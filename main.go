@@ -34,7 +34,6 @@ func main() {
 	if err := godotenv.Load(); err != nil {
 		fmt.Errorf("Error loading .env file ")
 	}
-
 	config.LoadFromEnv()
 
 	setupDB()

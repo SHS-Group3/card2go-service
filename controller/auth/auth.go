@@ -3,7 +3,6 @@ package auth
 import (
 	auth "card2go_service/authentication"
 	"card2go_service/model"
-	"errors"
 	"net/http"
 
 	"github.com/gofiber/fiber/v2"
@@ -22,10 +21,7 @@ func HandleAuthentication(c *fiber.Ctx) error {
 	var info authenticationInfo
 
 	if err := c.BodyParser(&info); err != nil {
-		c.Status(http.StatusBadRequest).JSON(fiber.Map{
-			"message": err.Error(),
-		})
-		return nil
+		return err
 	}
 
 	var user model.User
@@ -33,16 +29,11 @@ func HandleAuthentication(c *fiber.Ctx) error {
 	DB.Where("username = ? AND password = ?", info.Username, info.Password).Select("id").Limit(1).Find(&user)
 
 	if user.ID == 0 {
-		err := errors.New("authentication failed")
-		c.Status(http.StatusUnauthorized).JSON(fiber.Map{
-			"message": err.Error(),
-		})
-		return nil
+		return fiber.NewError(fiber.StatusUnauthorized, "authentication failed")
 	}
 
-	token := auth.CreateSignedToken(user.ID)
 	c.Status(http.StatusOK).JSON(fiber.Map{
-		"token": token,
+		"token": auth.CreateSignedToken(user.ID),
 	})
 
 	return nil
@@ -60,19 +51,12 @@ func HandleRegister(c *fiber.Ctx) error {
 	var info registrationInfo
 
 	if err := c.BodyParser(&info); err != nil {
-		c.Status(http.StatusBadRequest).JSON(fiber.Map{
-			"message": err.Error(),
-		})
-		return nil
+		return err
 	}
 
 	// check if username and password field were initialized
 	if info.Username == "" || info.Password == "" {
-		err := errors.New("missing fields")
-		c.Status(http.StatusBadRequest).JSON(fiber.Map{
-			"message": err.Error(),
-		})
-		return nil
+		return fiber.NewError(fiber.StatusBadRequest, "missing username or password")
 	}
 
 	// check if username is unique
@@ -81,18 +65,14 @@ func HandleRegister(c *fiber.Ctx) error {
 	DB.Where("username = ?", info.Username).Model(&model.User{}).Count(&count)
 
 	if count > 0 {
-		err := errors.New("username taken")
-		c.Status(http.StatusBadRequest).JSON(fiber.Map{
-			"message": err.Error(),
-		})
-		return nil
+		return fiber.NewError(fiber.StatusConflict, "username already taken")
 	}
 
-	var user model.User
-
-	user.Username = info.Username
-	user.Password = info.Password
-	user.Admin = false
+	user := model.User{
+		Username: info.Username,
+		Password: info.Password,
+		Admin:    false,
+	}
 
 	DB.Create(&user)
 

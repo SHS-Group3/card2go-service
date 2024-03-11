@@ -1,6 +1,8 @@
 package bookings
 
 import (
+	"card2go_service/model"
+
 	"github.com/gofiber/fiber/v2"
 	"gorm.io/gorm"
 )
@@ -10,6 +12,7 @@ import (
 // requires database
 func HandleBookings(c *fiber.Ctx) error {
 	DB := c.Locals("database").(*gorm.DB)
-	_ = DB
+	user := c.Locals("user").(model.User)
+	_, _ = DB, user
 	return nil
 }
