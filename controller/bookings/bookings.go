@@ -13,6 +13,11 @@ import (
 func HandleBookings(c *fiber.Ctx) error {
 	DB := c.Locals("database").(*gorm.DB)
 	user := c.Locals("user").(model.User)
-	_, _ = DB, user
+
+	var bookings []model.Booking
+	DB.Where("user_id = ?", user.ID).Preload("User").Preload("Destination").Preload("Packages").Find(&bookings)
+
+	c.Status(fiber.StatusOK).JSON(bookings)
+
 	return nil
 }

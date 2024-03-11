@@ -3,6 +3,7 @@ package routes
 import (
 	"card2go_service/controller/admin"
 	"card2go_service/controller/auth"
+	"card2go_service/controller/bookings"
 	"card2go_service/controller/destinations"
 	"card2go_service/controller/middleware"
 
@@ -12,7 +13,13 @@ import (
 func RegisterAPI(app *fiber.App) {
 	RegisterAdmin(app)
 	RegisterAuth(app)
+	RegisterBookings(app)
 	RegisterDestinations(app)
+}
+
+func RegisterBookings(app *fiber.App) {
+	path := app.Group("/bookings", middleware.RequireDatabase, middleware.RequireAuth)
+	path.Post("/", bookings.HandleBookings)
 }
 
 func RegisterAdmin(app *fiber.App) {
