@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/gofiber/fiber/v2"
 	"gorm.io/gorm"
@@ -46,6 +47,7 @@ func HandleDestination(c *fiber.Ctx) error {
 	}
 
 	// response representations
+	// TODO: unify these
 	type returnPackage struct {
 		ID          uint   `json:"id"`
 		Title       string `json:"title"`
@@ -94,13 +96,14 @@ func HandleFeed(c *fiber.Ctx) error {
 	DB := c.Locals("database").(*gorm.DB)
 
 	offset := (c.QueryInt("page", 1) - 1) * 20
-	//
+	hotels := c.QueryBool("hotels")
+
 	if offset < 0 {
 		return fiber.NewError(fiber.ErrBadRequest.Code, "invalid page")
 	}
 
 	var dests []model.Destination
-	err := DB.Model(&model.Destination{}).Preload("Packages").Order("created_at desc").Offset(offset).Limit(20).Find(&dests).Error
+	err := DB.Model(&model.Destination{}).Where("is_lodging = ?", hotels).Preload("Packages").Order("created_at desc").Offset(offset).Limit(20).Find(&dests).Error
 	if err != nil {
 		return err
 	}
@@ -132,6 +135,9 @@ func HandleFeed(c *fiber.Ctx) error {
 			Name:        dest.Name,
 			Address:     dest.Address,
 			Description: dest.Description,
+			IsLodging:   dest.IsLodging,
+			Beds:        dest.Beds,
+			Rooms:       dest.Rooms,
 		}
 
 		for _, j := range dest.Packages {
@@ -180,7 +186,12 @@ func HandleBook(c *fiber.Ctx) error {
 	// look up pkg before making creation query
 	var pkg model.Package
 	if pid != 0 {
-		DB.Limit(1).Find(&pkg, pid)
+		for _, i := range dest.Packages {
+			if i.ID == uint(pid) {
+				pkg = i
+				break
+			}
+		}
 
 		if pkg.ID == 0 {
 			return fiber.NewError(fiber.ErrBadRequest.Code, "package id not found")
@@ -205,8 +216,50 @@ func HandleBook(c *fiber.Ctx) error {
 		return err
 	}
 
-	c.Status(fiber.StatusCreated).JSON(fiber.Map{
-		"id": booking.ID,
+	type returnUser struct {
+		ID       uint   `json:"id"`
+		Username string `json:"username"`
+	}
+
+	type returnDestination struct {
+		ID   uint   `json:"id"`
+		Name string `json:"username"`
+	}
+
+	type returnPackage struct {
+		ID          uint   `json:"id"`
+		Title       string `json:"title"`
+		Description string `json:"description"`
+	}
+
+	type returnBooking struct {
+		ID          uint              `json:"id"`
+		User        returnUser        `json:"user"`
+		Destination returnDestination `json:"destination"`
+		Package     returnPackage     `json:"package"`
+		On          time.Time         `json:"on"`
+	}
+
+	var p *returnPackage
+	if booking.Package != nil {
+		p = &returnPackage{
+			ID:          *booking.PackageID,
+			Title:       booking.Package.Title,
+			Description: booking.Package.Description,
+		}
+	}
+
+	c.Status(fiber.StatusCreated).JSON(returnBooking{
+		ID: booking.ID,
+		User: returnUser{
+			ID:       booking.UserID,
+			Username: booking.User.Username,
+		},
+		Destination: returnDestination{
+			ID:   booking.DestinationID,
+			Name: booking.Destination.Name,
+		},
+		Package: *p,
 	})
 
 	return nil
