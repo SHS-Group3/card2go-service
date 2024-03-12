@@ -8,7 +8,6 @@ import (
 
 type Booking struct {
 	gorm.Model
-	BookingID uint `gorm:"unique;autoIncrement"`
 
 	On time.Time
 
