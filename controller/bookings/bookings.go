@@ -26,6 +26,7 @@ type returnBooking struct {
 	Destination returnDestination `json:"destination"`
 	Package     *returnPackage    `json:"package"`
 	On          time.Time         `json:"on"`
+	Tickets     uint              `json:"tickets"`
 }
 
 // GET /bookings
@@ -59,6 +60,8 @@ func HandleBookings(c *fiber.Ctx) error {
 				Name:        i.Destination.Name,
 				Description: i.Destination.Description,
 			},
+			On:      i.On,
+			Tickets: i.Tickets,
 			Package: p,
 		}
 		returnBookings = append(returnBookings, a)
@@ -107,6 +110,7 @@ func HandleBooking(c *fiber.Ctx) error {
 			ID:   booking.DestinationID,
 			Name: booking.Destination.Name,
 		},
+		Tickets: booking.Tickets,
 		On:      booking.On,
 		Package: p,
 	})
@@ -156,6 +160,7 @@ func HandleCancel(c *fiber.Ctx) error {
 			Name:        booking.Destination.Name,
 			Description: booking.Destination.Description,
 		},
+		Tickets: booking.Tickets,
 		On:      booking.On,
 		Package: p,
 	})
