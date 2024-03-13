@@ -13,9 +13,10 @@ import (
 )
 
 type returnPackage struct {
-	ID          uint   `json:"id"`
-	Title       string `json:"title"`
-	Description string `json:"description"`
+	ID          uint     `json:"id"`
+	Title       string   `json:"title"`
+	Description string   `json:"description"`
+	Price       *float64 `json:"price"`
 }
 
 type returnDestination struct {
@@ -83,6 +84,7 @@ func HandleDestination(c *fiber.Ctx) error {
 			ID:          i.ID,
 			Title:       i.Title,
 			Description: i.Description,
+			Price:       i.Price,
 		}
 
 		a.Packages = append(a.Packages, p)
@@ -130,6 +132,7 @@ func HandleFeed(c *fiber.Ctx) error {
 				ID:          j.ID,
 				Title:       j.Title,
 				Description: j.Description,
+				Price:       j.Price,
 			}
 
 			a.Packages = append(a.Packages, p)
@@ -245,6 +248,7 @@ func HandleBook(c *fiber.Ctx) error {
 			ID:          *booking.PackageID,
 			Title:       booking.Package.Title,
 			Description: booking.Package.Description,
+			Price:       booking.Package.Price,
 		}
 	}
 
