@@ -169,7 +169,8 @@ func HandleBook(c *fiber.Ctx) error {
 	}
 
 	type bookingInfo struct {
-		On time.Time `json:"on"`
+		On      time.Time `json:"on"`
+		Tickets uint      `json:"tickets"`
 	}
 	var info bookingInfo
 
@@ -197,6 +198,7 @@ func HandleBook(c *fiber.Ctx) error {
 		Destination: dest,
 		User:        user,
 		On:          info.On,
+		Tickets:     info.Tickets,
 	}
 	if pid != 0 {
 		booking.Package = &pkg
@@ -232,6 +234,7 @@ func HandleBook(c *fiber.Ctx) error {
 		ID          uint              `json:"id"`
 		User        returnUser        `json:"user"`
 		Destination returnDestination `json:"destination"`
+		Tickets     uint              `json:"tickets"`
 		Package     *returnPackage    `json:"package"`
 		On          time.Time         `json:"on"`
 	}
@@ -255,6 +258,7 @@ func HandleBook(c *fiber.Ctx) error {
 			ID:   booking.DestinationID,
 			Name: booking.Destination.Name,
 		},
+		Tickets: booking.Tickets,
 		Package: p,
 		On:      booking.On,
 	})
