@@ -55,8 +55,9 @@ func HandleBookings(c *fiber.Ctx) error {
 		a := returnBooking{
 			ID: i.ID,
 			Destination: returnDestination{
-				ID:   i.DestinationID,
-				Name: i.Destination.Name,
+				ID:          i.DestinationID,
+				Name:        i.Destination.Name,
+				Description: i.Destination.Description,
 			},
 			Package: p,
 		}
