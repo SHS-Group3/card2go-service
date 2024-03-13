@@ -28,7 +28,6 @@ func HandleCreateDummyDestinations(c *fiber.Ctx) error {
 	var dests []model.Destination
 
 	for i := range 40 {
-		price := float64(i) * 100.
 		dests = append(dests, model.Destination{
 			Name:        fmt.Sprintf("dummy%d", i),
 			Description: fmt.Sprintf("entry no. %d", i),
@@ -45,12 +44,12 @@ func HandleCreateDummyDestinations(c *fiber.Ctx) error {
 				{
 					Title:       "your soul",
 					Description: "we receive your soul",
-					Price:       &price,
+					Price:       float64(i) * 100.,
 				},
 				{
 					Title:       "offered to demons bundle",
 					Description: "lose your soul and your organs all in one bundle!",
-					Price:       &price,
+					Price:       float64(i) * 200.,
 				},
 			},
 		})

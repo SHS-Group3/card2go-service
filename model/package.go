@@ -6,8 +6,8 @@ import (
 
 type Package struct {
 	gorm.Model
-	DestinationID uint     `gorm:"not null"`
-	Title         string   `json:"title" gorm:"not null"`
-	Description   string   `json:"description" gorm:"not null"`
-	Price         *float64 `json:"price"`
+	DestinationID uint    `gorm:"not null"`
+	Title         string  `json:"title" gorm:"not null"`
+	Description   string  `json:"description" gorm:"not null"`
+	Price         float64 `json:"price"`
 }
