@@ -9,8 +9,9 @@ import (
 )
 
 type returnDestination struct {
-	ID   uint   `json:"id"`
-	Name string `json:"name"`
+	ID          uint   `json:"id"`
+	Name        string `json:"name"`
+	Description string `json:"description"`
 }
 
 type returnPackage struct {
@@ -150,8 +151,9 @@ func HandleCancel(c *fiber.Ctx) error {
 	c.Status(fiber.StatusOK).JSON(returnBooking{
 		ID: booking.ID,
 		Destination: returnDestination{
-			ID:   booking.DestinationID,
-			Name: booking.Destination.Name,
+			ID:          booking.DestinationID,
+			Name:        booking.Destination.Name,
+			Description: booking.Destination.Description,
 		},
 		On:      booking.On,
 		Package: p,
