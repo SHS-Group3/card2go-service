@@ -45,8 +45,10 @@ func HandleRegister(c *fiber.Ctx) error {
 	DB := c.Locals("database").(*gorm.DB)
 
 	type registrationInfo struct {
-		Username string `json: "username"`
-		Password string `json: "password"`
+		Username      string `json:"username"`
+		Password      string `json:"password"`
+		Email         string `json:"email"`
+		ContactNumber string `json:"contact_number"`
 	}
 	var info registrationInfo
 
@@ -55,8 +57,8 @@ func HandleRegister(c *fiber.Ctx) error {
 	}
 
 	// check if username and password field were initialized
-	if info.Username == "" || info.Password == "" {
-		return fiber.NewError(fiber.StatusBadRequest, "missing username or password")
+	if info.Username == "" || info.Password == "" || info.ContactNumber == "" || info.Email == "" {
+		return fiber.NewError(fiber.StatusBadRequest, "missing field(s)")
 	}
 
 	// check if username is unique
@@ -69,9 +71,11 @@ func HandleRegister(c *fiber.Ctx) error {
 	}
 
 	user := model.User{
-		Username: info.Username,
-		Password: info.Password,
-		Admin:    false,
+		Username:      info.Username,
+		Password:      info.Password,
+		ContactNumber: info.ContactNumber,
+		Email:         info.Email,
+		Admin:         false,
 	}
 
 	DB.Create(&user)
