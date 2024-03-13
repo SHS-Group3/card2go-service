@@ -238,6 +238,7 @@ func HandleBook(c *fiber.Ctx) error {
 		User        returnUser        `json:"user"`
 		Destination returnDestination `json:"destination"`
 		Tickets     uint              `json:"tickets"`
+		CreatedAt   time.Time         `json:"created_at"`
 		Package     *returnPackage    `json:"package"`
 		On          time.Time         `json:"on"`
 	}
@@ -262,9 +263,10 @@ func HandleBook(c *fiber.Ctx) error {
 			ID:   booking.DestinationID,
 			Name: booking.Destination.Name,
 		},
-		Tickets: booking.Tickets,
-		Package: p,
-		On:      booking.On,
+		Tickets:   booking.Tickets,
+		CreatedAt: booking.CreatedAt,
+		Package:   p,
+		On:        booking.On,
 	})
 
 	return nil
