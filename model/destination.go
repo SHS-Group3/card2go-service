@@ -6,13 +6,14 @@ import (
 
 type Destination struct {
 	gorm.Model
-	Name        string  `json:"name" gorm:"not null"`
-	Description string  `json:"description" gorm:"not null"`
-	Address     string  `json:"address" gorm:"not null"`
-	Ratings     float64 `json:"ratings"`
-	IsLodging   bool    `json:"is_lodging"`
-	Beds        int     `json:"beds"`
-	Rooms       int     `json:"rooms"`
+	Name        string `json:"name" gorm:"not null"`
+	Description string `json:"description" gorm:"not null"`
+	Address     string `json:"address" gorm:"not null"`
+
+	IsLodging bool    `json:"is_lodging"`
+	Ratings   float64 `json:"ratings"`
+	Beds      int     `json:"beds"`
+	Rooms     int     `json:"rooms"`
 
 	Packages []Package `json:"packages"`
 }
