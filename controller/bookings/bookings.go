@@ -10,7 +10,7 @@ import (
 
 type returnDestination struct {
 	ID   uint   `json:"id"`
-	Name string `json:"username"`
+	Name string `json:"name"`
 }
 
 type returnPackage struct {
@@ -126,7 +126,7 @@ func HandleCancel(c *fiber.Ctx) error {
 
 	var booking model.Booking
 
-	if err := DB.Where("user_id = ?", user.ID).Limit(1).Find(&booking, id).Error; err != nil {
+	if err := DB.Where("user_id = ?", user.ID).Preload("Package").Preload("Destination").Limit(1).Find(&booking, id).Error; err != nil {
 		return err
 	}
 	if booking.ID == 0 {
