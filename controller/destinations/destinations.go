@@ -13,10 +13,10 @@ import (
 )
 
 type returnPackage struct {
-	ID          uint     `json:"id"`
-	Title       string   `json:"title"`
-	Description string   `json:"description"`
-	Price       *float64 `json:"price"`
+	ID          uint    `json:"id"`
+	Title       string  `json:"title"`
+	Description string  `json:"description"`
+	Price       float64 `json:"price"`
 }
 
 type returnDestination struct {
@@ -227,10 +227,10 @@ func HandleBook(c *fiber.Ctx) error {
 	}
 
 	type returnPackage struct {
-		ID          uint     `json:"id"`
-		Title       string   `json:"title"`
-		Description string   `json:"description"`
-		Price       *float64 `json:"price"`
+		ID          uint    `json:"id"`
+		Title       string  `json:"title"`
+		Description string  `json:"description"`
+		Price       float64 `json:"price"`
 	}
 
 	type returnBooking struct {
