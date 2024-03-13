@@ -11,9 +11,9 @@ import (
 func HandleInfo(c *fiber.Ctx) error {
 	user := c.Locals("user").(model.User)
 	type returnInfo struct {
-		Username      string
-		Email         string
-		ContactNumber string
+		Username      string `json:"username"`
+		Email         string `json:"email"`
+		ContactNumber string `json:"contact_number"`
 	}
 
 	c.JSON(returnInfo{
