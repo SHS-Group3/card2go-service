@@ -8,6 +8,31 @@ import (
 	"gorm.io/gorm"
 )
 
+type returnUser struct {
+	ID       uint   `json:"id"`
+	Username string `json:"username"`
+}
+
+type returnDestination struct {
+	ID   uint   `json:"id"`
+	Name string `json:"username"`
+}
+
+type returnPackage struct {
+	ID          uint     `json:"id"`
+	Title       string   `json:"title"`
+	Description string   `json:"description"`
+	Price       *float64 `json:"price"`
+}
+
+type returnBooking struct {
+	ID          uint              `json:"id"`
+	User        returnUser        `json:"user"`
+	Destination returnDestination `json:"destination"`
+	Package     *returnPackage    `json:"package"`
+	On          time.Time         `json:"on"`
+}
+
 // GET /bookings
 // requires authorization
 // requires database
@@ -16,30 +41,8 @@ func HandleBookings(c *fiber.Ctx) error {
 	user := c.Locals("user").(model.User)
 
 	var bookings []model.Booking
-	DB.Where("user_id = ?", user.ID).Preload("User").Preload("Destination").Preload("Packages").Find(&bookings)
-
-	type returnUser struct {
-		ID       uint
-		Username string
-	}
-
-	type returnDestination struct {
-		ID   uint
-		Name string
-	}
-
-	type returnPackage struct {
-		ID          uint
-		Title       string
-		Description string
-	}
-
-	type returnBooking struct {
-		ID          uint `json:"id"`
-		User        returnUser
-		Destination returnDestination
-		Package     returnPackage
-		On          time.Time
+	if err := DB.Where("user_id = ?", user.ID).Preload("Destination").Preload("Package").Preload("User").Find(&bookings).Error; err != nil {
+		return err
 	}
 
 	returnBookings := []returnBooking{}
@@ -50,6 +53,7 @@ func HandleBookings(c *fiber.Ctx) error {
 				ID:          *i.PackageID,
 				Title:       i.Package.Title,
 				Description: i.Package.Description,
+				Price:       i.Package.Price,
 			}
 		}
 
@@ -63,7 +67,7 @@ func HandleBookings(c *fiber.Ctx) error {
 				ID:   i.DestinationID,
 				Name: i.Destination.Name,
 			},
-			Package: *p,
+			Package: p,
 		}
 		returnBookings = append(returnBookings, a)
 	}
@@ -88,35 +92,11 @@ func HandleBooking(c *fiber.Ctx) error {
 
 	var booking model.Booking
 
-	if err := DB.Where("user_id = ?", user.ID).Preload("User").Preload("Destination").Preload("Packages").Limit(1).Find(&booking, id).Error; err != nil {
+	if err := DB.Where("user_id = ?", user.ID).Preload("User").Preload("Destination").Preload("Package").Limit(1).Find(&booking, id).Error; err != nil {
 		return err
 	}
 	if booking.ID == 0 {
 		return fiber.NewError(fiber.StatusNotFound, "booking not found")
-	}
-
-	type returnUser struct {
-		ID       uint   `json:"id"`
-		Username string `json:"username"`
-	}
-
-	type returnDestination struct {
-		ID   uint   `json:"id"`
-		Name string `json:"username"`
-	}
-
-	type returnPackage struct {
-		ID          uint   `json:"id"`
-		Title       string `json:"title"`
-		Description string `json:"description"`
-	}
-
-	type returnBooking struct {
-		ID          uint              `json:"id"`
-		User        returnUser        `json:"user"`
-		Destination returnDestination `json:"destination"`
-		Package     returnPackage     `json:"package"`
-		On          time.Time         `json:"on"`
 	}
 
 	var p *returnPackage
@@ -125,6 +105,7 @@ func HandleBooking(c *fiber.Ctx) error {
 			ID:          *booking.PackageID,
 			Title:       booking.Package.Title,
 			Description: booking.Package.Description,
+			Price:       booking.Package.Price,
 		}
 	}
 
@@ -139,7 +120,7 @@ func HandleBooking(c *fiber.Ctx) error {
 			Name: booking.Destination.Name,
 		},
 		On:      booking.On,
-		Package: *p,
+		Package: p,
 	})
 
 	return nil
@@ -170,36 +151,13 @@ func HandleCancel(c *fiber.Ctx) error {
 		return err
 	}
 
-	type returnUser struct {
-		ID       uint   `json:"id"`
-		Username string `json:"username"`
-	}
-
-	type returnDestination struct {
-		ID   uint   `json:"id"`
-		Name string `json:"username"`
-	}
-
-	type returnPackage struct {
-		ID          uint   `json:"id"`
-		Title       string `json:"title"`
-		Description string `json:"description"`
-	}
-
-	type returnBooking struct {
-		ID          uint              `json:"id"`
-		User        returnUser        `json:"user"`
-		Destination returnDestination `json:"destination"`
-		Package     returnPackage     `json:"package"`
-		On          time.Time         `json:"on"`
-	}
-
 	var p *returnPackage
 	if booking.Package != nil {
 		p = &returnPackage{
 			ID:          *booking.PackageID,
 			Title:       booking.Package.Title,
 			Description: booking.Package.Description,
+			Price:       booking.Package.Price,
 		}
 	}
 
@@ -214,7 +172,7 @@ func HandleCancel(c *fiber.Ctx) error {
 			Name: booking.Destination.Name,
 		},
 		On:      booking.On,
-		Package: *p,
+		Package: p,
 	})
 
 	return nil
