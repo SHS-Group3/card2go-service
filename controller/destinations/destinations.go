@@ -12,6 +12,26 @@ import (
 	"gorm.io/gorm"
 )
 
+type returnPackage struct {
+	ID          uint   `json:"id"`
+	Title       string `json:"title"`
+	Description string `json:"description"`
+}
+
+type returnDestination struct {
+	ID          uint    `json:"id"`
+	Name        string  `json:"name"`
+	Description string  `json:"description"`
+	Address     string  `json:"address"`
+	IsLodging   bool    `json:"is_lodging"`
+	Booked      bool    `json:"booked"`
+	Ratings     float64 `json:"ratings"`
+	Beds        int     `json:"beds"`
+	Rooms       int     `json:"rooms"`
+
+	Packages []returnPackage `json:"packages"`
+}
+
 // GET /destination/:id
 // requires database
 func HandleDestination(c *fiber.Ctx) error {
@@ -29,7 +49,7 @@ func HandleDestination(c *fiber.Ctx) error {
 		return fiber.NewError(fiber.ErrBadRequest.Code, "destination id not found")
 	}
 
-	booked := false
+	var booked bool = false
 
 	authorization := c.Get("Authorization")
 	if authorization != "" {
@@ -48,30 +68,13 @@ func HandleDestination(c *fiber.Ctx) error {
 
 	// response representations
 	// TODO: unify these
-	type returnPackage struct {
-		ID          uint   `json:"id"`
-		Title       string `json:"title"`
-		Description string `json:"description"`
-	}
-
-	type returnDestination struct {
-		ID          uint   `json:"id"`
-		Name        string `json:"name"`
-		Description string `json:"description"`
-		Address     string `json:"address"`
-		IsLodging   bool   `json:"is_lodging"`
-		Booked      bool   `json:"booked"`
-		Beds        int    `json:"beds"`
-		Rooms       int    `json:"rooms"`
-
-		Packages []returnPackage `json:"packages"`
-	}
 
 	a := returnDestination{
 		ID:          dest.ID,
 		Name:        dest.Name,
 		Address:     dest.Address,
 		Description: dest.Description,
+		Ratings:     dest.Ratings,
 		Booked:      booked,
 	}
 
@@ -108,25 +111,6 @@ func HandleFeed(c *fiber.Ctx) error {
 		return err
 	}
 
-	// response representations
-	type returnPackage struct {
-		ID          uint   `json:"id"`
-		Title       string `json:"title"`
-		Description string `json:"description"`
-	}
-
-	type returnDestination struct {
-		ID          uint   `json:"id"`
-		Name        string `json:"name"`
-		Description string `json:"description"`
-		Address     string `json:"address"`
-		IsLodging   bool   `json:"is_lodging"`
-		Beds        int    `json:"beds"`
-		Rooms       int    `json:"rooms"`
-
-		Packages []returnPackage `json:"packages"`
-	}
-
 	var returnDests []returnDestination
 
 	for _, dest := range dests {
@@ -136,6 +120,7 @@ func HandleFeed(c *fiber.Ctx) error {
 			Address:     dest.Address,
 			Description: dest.Description,
 			IsLodging:   dest.IsLodging,
+			Ratings:     dest.Ratings,
 			Beds:        dest.Beds,
 			Rooms:       dest.Rooms,
 		}
@@ -183,6 +168,15 @@ func HandleBook(c *fiber.Ctx) error {
 		return fiber.NewError(fiber.ErrBadRequest.Code, "invalid package id")
 	}
 
+	type bookingInfo struct {
+		On time.Time `json:"on"`
+	}
+	var info bookingInfo
+
+	if err := c.BodyParser(&info); err != nil {
+		return err
+	}
+
 	// look up pkg before making creation query
 	var pkg model.Package
 	if pid != 0 {
@@ -202,6 +196,7 @@ func HandleBook(c *fiber.Ctx) error {
 		// On: ...
 		Destination: dest,
 		User:        user,
+		On:          info.On,
 	}
 	if pid != 0 {
 		booking.Package = &pkg
@@ -227,16 +222,17 @@ func HandleBook(c *fiber.Ctx) error {
 	}
 
 	type returnPackage struct {
-		ID          uint   `json:"id"`
-		Title       string `json:"title"`
-		Description string `json:"description"`
+		ID          uint     `json:"id"`
+		Title       string   `json:"title"`
+		Description string   `json:"description"`
+		Price       *float64 `json:"price"`
 	}
 
 	type returnBooking struct {
 		ID          uint              `json:"id"`
 		User        returnUser        `json:"user"`
 		Destination returnDestination `json:"destination"`
-		Package     returnPackage     `json:"package"`
+		Package     *returnPackage    `json:"package"`
 		On          time.Time         `json:"on"`
 	}
 
@@ -259,7 +255,8 @@ func HandleBook(c *fiber.Ctx) error {
 			ID:   booking.DestinationID,
 			Name: booking.Destination.Name,
 		},
-		Package: *p,
+		Package: p,
+		On:      booking.On,
 	})
 
 	return nil

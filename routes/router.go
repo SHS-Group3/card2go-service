@@ -6,6 +6,7 @@ import (
 	"card2go_service/controller/bookings"
 	"card2go_service/controller/destinations"
 	"card2go_service/controller/middleware"
+	"card2go_service/controller/user"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -15,11 +16,19 @@ func RegisterAPI(app *fiber.App) {
 	RegisterAuth(app)
 	RegisterBookings(app)
 	RegisterDestinations(app)
+	RegisterUser(app)
+}
+
+func RegisterUser(app *fiber.App) {
+	path := app.Group("/user", middleware.RequireDatabase, middleware.RequireAuth)
+	path.Get("/", user.HandleInfo)
 }
 
 func RegisterBookings(app *fiber.App) {
 	path := app.Group("/bookings", middleware.RequireDatabase, middleware.RequireAuth)
-	path.Post("/", bookings.HandleBookings)
+	path.Get("/", bookings.HandleBookings)
+	path.Get("/:id", bookings.HandleBooking)
+	path.Delete("/:id", bookings.HandleCancel)
 }
 
 func RegisterAdmin(app *fiber.App) {
