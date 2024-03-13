@@ -8,11 +8,6 @@ import (
 	"gorm.io/gorm"
 )
 
-type returnUser struct {
-	ID       uint   `json:"id"`
-	Username string `json:"username"`
-}
-
 type returnDestination struct {
 	ID   uint   `json:"id"`
 	Name string `json:"username"`
@@ -27,7 +22,6 @@ type returnPackage struct {
 
 type returnBooking struct {
 	ID          uint              `json:"id"`
-	User        returnUser        `json:"user"`
 	Destination returnDestination `json:"destination"`
 	Package     *returnPackage    `json:"package"`
 	On          time.Time         `json:"on"`
@@ -59,10 +53,6 @@ func HandleBookings(c *fiber.Ctx) error {
 
 		a := returnBooking{
 			ID: i.ID,
-			User: returnUser{
-				ID:       i.UserID,
-				Username: i.User.Username,
-			},
 			Destination: returnDestination{
 				ID:   i.DestinationID,
 				Name: i.Destination.Name,
@@ -111,10 +101,6 @@ func HandleBooking(c *fiber.Ctx) error {
 
 	c.Status(fiber.StatusOK).JSON(returnBooking{
 		ID: booking.ID,
-		User: returnUser{
-			ID:       booking.UserID,
-			Username: booking.User.Username,
-		},
 		Destination: returnDestination{
 			ID:   booking.DestinationID,
 			Name: booking.Destination.Name,
@@ -140,7 +126,7 @@ func HandleCancel(c *fiber.Ctx) error {
 
 	var booking model.Booking
 
-	if err := DB.Where("user_id = ?", user.ID).Preload("User").Preload("Destination").Preload("Packages").Limit(1).Find(&booking, id).Error; err != nil {
+	if err := DB.Where("user_id = ?", user.ID).Limit(1).Find(&booking, id).Error; err != nil {
 		return err
 	}
 	if booking.ID == 0 {
@@ -163,10 +149,6 @@ func HandleCancel(c *fiber.Ctx) error {
 
 	c.Status(fiber.StatusOK).JSON(returnBooking{
 		ID: booking.ID,
-		User: returnUser{
-			ID:       booking.UserID,
-			Username: booking.User.Username,
-		},
 		Destination: returnDestination{
 			ID:   booking.DestinationID,
 			Name: booking.Destination.Name,
