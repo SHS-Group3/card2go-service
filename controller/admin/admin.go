@@ -38,16 +38,16 @@ func HandleCreateDummyDestinations(c *fiber.Ctx) error {
 			Beds:        i * 2,
 			Ratings:     math.Mod(float64(i)*1.3, 5.0),
 			Packages: []model.Package{
-				model.Package{
+				{
 					Title:       "your organs",
 					Description: "we receive your organs",
 				},
-				model.Package{
+				{
 					Title:       "your soul",
 					Description: "we receive your soul",
 					Price:       &price,
 				},
-				model.Package{
+				{
 					Title:       "offered to demons bundle",
 					Description: "lose your soul and your organs all in one bundle!",
 					Price:       &price,
